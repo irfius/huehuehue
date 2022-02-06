@@ -97,4 +97,4 @@ RUN set -eux; \
 
 EXPOSE 8888
 
-CMD ["./entrypont.sh"]
+CMD ["./entrypoint.sh"]
