@@ -46,6 +46,9 @@ RUN set -eux; \
     xmlsec1-openssl \
     zlib-devel
 
+COPY conf /tmp/conf
+COPY entrypoint.sh /tmp
+
 #python pip and node
 RUN set -eux; \
     curl -o get-pip.py https://bootstrap.pypa.io/pip/2.7/get-pip.py && \
@@ -55,22 +58,22 @@ RUN set -eux; \
     yum install -y nodejs && \
     npm i -g npm
 
-
-#huehuehue install and user add
+#huehuehue install (with conf) and user add
 RUN set -eux; \
     wget https://github.com/cloudera/hue/archive/refs/tags/release-4.10.0.tar.gz && \
     tar -xf release-4.10.0.tar.gz && \
-    mkdir /usr/share/hue && \
-    chown 777 -R /usr/share/hue && \
     cd hue-release-4.10.0 && \
+    rm -rf desktop/conf && \
+    mv /tmp/conf desktop/conf && \
     PREFIX=/usr/share make install && \
-    rm -rf /usr/share/hue/desktop/conf && \
     useradd -ms /bin/bash hue && chown -R hue /usr/share/hue
 
 WORKDIR /usr/share/hue
 
-# huehuehue extra # Install DB connectors
+# huehuehue extras [# Install DB connectors]
 RUN set -eux; \
+    mv /tmp/entrypoint.sh . && \
+    chmod +x entrypoint.sh && \
     ./build/env/bin/pip install \
     supervisor \
     psycopg2-binary \
@@ -91,8 +94,6 @@ RUN set -eux; \
     # Needed for Jaeger
     threadloop \
     thrift-sasl==0.2.1
-
-COPY entrypoint.sh .
 
 EXPOSE 8888
 
