@@ -22,7 +22,8 @@ RUN set -eux; \
     libffi-devel \
     libtidy \
     libxml2-devel \
-    libxslt-devel \
+    # need this in final verion
+    libxslt-devel \ 
     make \
     maven \
     mysql-devel \
